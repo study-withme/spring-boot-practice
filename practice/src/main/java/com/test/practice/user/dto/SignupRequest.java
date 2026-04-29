@@ -24,4 +24,7 @@ public class SignupRequest {
 
     // 2. 사이트 역할 추가 (enum)
     private String role;
+    private String username;
+    private String password;
+    private String nickname;
 }

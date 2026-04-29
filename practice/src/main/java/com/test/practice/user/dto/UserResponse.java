@@ -20,6 +20,13 @@ public class UserResponse {
                 user.getUsername(),
                 user.getNickname(),
                 user.getRole());
+
+    public static UserResponse from(User user) {
+        return new UserResponse(
+        user.getId(),
+        user.getUsername(),
+        user.getNickname()
+    );
     }
 
 }

@@ -21,12 +21,14 @@ public class UserController {
     //회원가입 컨트롤러
     @GetMapping("/signup")
     public UserResponse signup(@Valid @RequestBody SignupRequest signupRequest) {
+    public UserResponse signup(@RequestBody SignupRequest signupRequest) {
         return userService.signup(signupRequest);
     }
 
     // 로그인 컨트롤러
     @PostMapping("/login")
     public UserResponse login(@Valid @RequestBody LoginRequest loginRequest) {
+    public UserResponse login(@RequestBody LoginRequest loginRequest) {
         return userService.login(loginRequest);
     }
 

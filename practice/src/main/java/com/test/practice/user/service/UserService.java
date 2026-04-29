@@ -10,6 +10,9 @@ import com.test.practice.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import com.test.practice.user.entity.User;
+import com.test.practice.user.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,6 +56,10 @@ public class UserService {
         User savedUser = userRepository.save(user);
 
         // 5. 응답 DTO 변환
+                .build();
+
+        User savedUser = userRepository.save(user);
+
         return UserResponse.from(savedUser);
     }
 
@@ -72,6 +79,10 @@ public class UserService {
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
+        if (!user.getPassword().equals(loginRequest.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
         return UserResponse.from(user);
     }
 
