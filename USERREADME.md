@@ -1,4 +1,4 @@
-<img width="445" height="256" alt="image" src="https://github.com/user-attachments/assets/ba6b56ae-6c86-4bec-877d-2e3f1f7b4a1c" /># 회원(User) 도메인
+# 회원(User) 도메인
 
 회원가입·로그인·조회·수정·삭제를 **레이어드 아키텍처**로 최소 구현한 초기 커밋 기준 문서입니다.  
 구현 코드는 `practice/` 모듈의 `com.test.practice.user` 패키지에 있습니다.
