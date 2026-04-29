@@ -4,6 +4,7 @@ import com.test.practice.user.dto.LoginRequest;
 import com.test.practice.user.dto.SignupRequest;
 import com.test.practice.user.dto.UserResponse;
 import com.test.practice.user.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -19,12 +20,14 @@ public class UserController {
 
     //회원가입 컨트롤러
     @GetMapping("/signup")
+    public UserResponse signup(@Valid @RequestBody SignupRequest signupRequest) {
     public UserResponse signup(@RequestBody SignupRequest signupRequest) {
         return userService.signup(signupRequest);
     }
 
     // 로그인 컨트롤러
     @PostMapping("/login")
+    public UserResponse login(@Valid @RequestBody LoginRequest loginRequest) {
     public UserResponse login(@RequestBody LoginRequest loginRequest) {
         return userService.login(loginRequest);
     }
@@ -44,6 +47,7 @@ public class UserController {
     //회원 수정
     @PutMapping("/{id}")
     public UserResponse updateUser(
+            @Valid
             @PathVariable Long id,
             @RequestBody SignupRequest signupRequest
     ) {
