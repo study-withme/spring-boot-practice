@@ -166,8 +166,6 @@ practice/src/main/java/com/test/practice/post/
 BUILD SUCCESSFUL in 2s
 ```
 
-`USERREADME.md`처럼 **실제 IDE·Gradle 통과 화면**을 쓰려면, 캡처를 GitHub 이슈·PR 등에 올린 뒤 위 `<img>`의 `src`를 `https://github.com/user-attachments/assets/...` 주소로 바꾸면 됩니다.
-
 ## 현재 구현의 한계 · 보강 여지
 
 - 삭제 API는 **작성자 검증이 없음** — 누구나 `postId`만 알면 소프트 삭제 가능합니다. 수정과 동일하게 `userId` 또는 인증 주체와 맞추는 것이 좋습니다.
