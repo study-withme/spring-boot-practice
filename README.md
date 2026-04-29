@@ -38,6 +38,7 @@ practice/
 | 도메인 | 설명 |
 |--------|------|
 | 회원(User) | 가입·로그인·CRUD 초기 구현, 레이어 구조·테스트·향후 과제 — **[USERREADME.md](USERREADME.md)** |
+| 게시글(Post) | 작성·조회·소프트 삭제·작성자 연관, 검증·서비스 테스트 — **[POSTREADME.md](POSTREADME.md)** |
 
 ## 트러블슈팅 · 학습 노트
 
