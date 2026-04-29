@@ -154,8 +154,7 @@ practice/src/main/java/com/test/practice/post/
 
 ## 테스트
 
-<img width="445" height="256" alt="PostServiceTest 통과 화면 자리 — 실제 캡처로 교체" src="https://placehold.co/445x256/252836/b8c0d4?text=PostServiceTest+%7C+4+passed" />
-
+<img width="352" height="151" alt="image" src="https://github.com/user-attachments/assets/ca507378-2e85-485a-aeec-57a3932a142d" />
 - `practice/src/test/java/com/test/practice/post/service/PostServiceTest.java`
 - 게시글 작성 성공, 단건 조회 성공, 수정 성공, 삭제 성공(삭제 후 `deleteTime` 설정 여부)
 - 로컬 확인: `practice` 모듈에서  
