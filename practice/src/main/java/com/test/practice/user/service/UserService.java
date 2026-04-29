@@ -4,6 +4,7 @@ package com.test.practice.user.service;
 import com.test.practice.user.dto.LoginRequest;
 import com.test.practice.user.dto.SignupRequest;
 import com.test.practice.user.dto.UserResponse;
+import com.test.practice.user.entity.Role;
 import com.test.practice.user.entity.User;
 import com.test.practice.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class UserService {
                 .username(signupRequest.getUsername())
                 .password(signupRequest.getPassword())
                 .nickname(signupRequest.getNickname())
+                .role(Role.USER) // 기본적으로 USER 역할을 부여
                 .build();
 
         User savedUser = userRepository.save(user);

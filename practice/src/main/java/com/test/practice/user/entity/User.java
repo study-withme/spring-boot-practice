@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 @Table(name = "users")
@@ -26,6 +26,11 @@ public class User {
 
     @Column(nullable = false)
     private String nickname;
+
+    // 2. 사이트 역할 추가 (enum)
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

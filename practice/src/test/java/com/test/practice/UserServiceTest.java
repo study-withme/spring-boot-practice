@@ -3,6 +3,7 @@ package com.test.practice;
 import com.test.practice.user.dto.LoginRequest;
 import com.test.practice.user.dto.SignupRequest;
 import com.test.practice.user.dto.UserResponse;
+import com.test.practice.user.entity.Role;
 import com.test.practice.user.entity.User;
 import com.test.practice.user.repository.UserRepository;
 import com.test.practice.user.service.UserService;
@@ -45,6 +46,7 @@ class UserServiceTest {
                 .username("testuser")
                 .password("1234")
                 .nickname("테스터")
+                .role(Role.USER)
                 .build();
 
         when(userRepository.existsByUsername("testuser")).thenReturn(false);
@@ -89,6 +91,7 @@ class UserServiceTest {
                 .username("testuser")
                 .password("1234")
                 .nickname("테스터")
+                .role(Role.USER)
                 .build();
 
         when(userRepository.findByUsername("testuser"))
@@ -128,6 +131,7 @@ class UserServiceTest {
                 .username("testuser")
                 .password("1234")
                 .nickname("테스터")
+                .role(Role.USER)
                 .build();
 
         when(userRepository.findByUsername("testuser"))
@@ -146,6 +150,7 @@ class UserServiceTest {
                 .username("testuser")
                 .password("1234")
                 .nickname("테스터")
+                .role(Role.USER)
                 .build();
 
         when(userRepository.findById(1L))
@@ -166,6 +171,7 @@ class UserServiceTest {
                 .username("user1")
                 .password("1234")
                 .nickname("유저1")
+                .role(Role.USER)
                 .build();
 
         User user2 = User.builder()
@@ -173,6 +179,7 @@ class UserServiceTest {
                 .username("user2")
                 .password("1234")
                 .nickname("유저2")
+                .role(Role.USER)
                 .build();
 
         when(userRepository.findAll())
@@ -193,6 +200,7 @@ class UserServiceTest {
                 .username("old")
                 .password("1111")
                 .nickname("기존닉")
+                .role(Role.USER)
                 .build();
 
         SignupRequest request = new SignupRequest();
@@ -221,6 +229,7 @@ class UserServiceTest {
                 .username("testuser")
                 .password("1234")
                 .nickname("테스터")
+                .role(Role.USER)
                 .build();
 
         when(userRepository.findById(1L))
