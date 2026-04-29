@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Table(name = "users")
@@ -28,7 +27,6 @@ public class User {
     @Column(nullable = false)
     private String nickname;
 
-    // 2. 사이트 역할 추가 (enum)
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;

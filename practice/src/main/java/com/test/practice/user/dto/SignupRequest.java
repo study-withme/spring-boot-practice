@@ -1,6 +1,5 @@
 package com.test.practice.user.dto;
 
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -22,9 +21,5 @@ public class SignupRequest {
     @Size(min = 2, max = 20, message = "닉네임은 2자 이상 20자 이하로 입력해주세요.")
     private String nickname;
 
-    // 2. 사이트 역할 추가 (enum)
     private String role;
-    private String username;
-    private String password;
-    private String nickname;
 }

@@ -12,6 +12,5 @@ public class LoginRequest {
     private String username;
 
     @NotBlank(message = "비밀번호는 필수 입니다.")
-    private String username;
     private String password;
 }

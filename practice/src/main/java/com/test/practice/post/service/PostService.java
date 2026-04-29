@@ -41,21 +41,21 @@ public class PostService {
     }
 
     public List<PostResponse> getPosts() {
-        return postRepository.findAll()
+        return postRepository.findByDeleteTimeIsNull()
                 .stream()
                 .map(PostResponse::new)
                 .toList();
     }
 
     public PostResponse getPost(Long postId) {
-        Post post = postRepository.findById(postId)
+        Post post = postRepository.findByIdAndDeleteTimeIsNull(postId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
 
         return new PostResponse(post);
     }
 
     public List<PostResponse> getPostsByUser(Long userId) {
-        return postRepository.findByUserId(userId)
+        return postRepository.findByUser_IdAndDeleteTimeIsNull(userId)
                 .stream()
                 .map(PostResponse::new)
                 .toList();
@@ -63,9 +63,13 @@ public class PostService {
 
     //글수정
     @Transactional
-    public PostResponse updatePost(Long postId, PostUpdateRequest request) {
-        Post post = postRepository.findById(postId)
+    public PostResponse updatePost(Long userId, Long postId, PostUpdateRequest request) {
+        Post post = postRepository.findByIdAndDeleteTimeIsNull(postId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
+
+        if (!post.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("게시글 작성자만 수정할 수 있습니다.");
+        }
 
         post.update(request.getTitle(), request.getContent());
 
