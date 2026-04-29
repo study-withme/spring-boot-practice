@@ -54,7 +54,7 @@ practice/src/main/java/com/test/practice/user/
 | DELETE | `/api/users/{id}` | 회원 삭제 (응답 204 No Content) |
 
 ## 테스트
-
+<img width="445" height="256" alt="image" src="https://github.com/user-attachments/assets/6c109bfa-6c44-4f1c-8e0e-a3e1b3e9d208" />
 - `practice/src/test/java/com/test/practice/UserServiceTest.java`
 - 회원가입 성공/중복 아이디, 로그인 성공·실패, 단건·전체 조회, 수정, 삭제 시나리오
 
