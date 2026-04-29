@@ -21,12 +21,15 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
+
+    private static final String RAW_PASSWORD = "password12";
 
     @Mock
     private UserRepository userRepository;
@@ -42,18 +45,20 @@ class UserServiceTest {
     void signup_success() {
         SignupRequest request = new SignupRequest();
         request.setUsername("testuser");
-        request.setPassword("1234");
+        request.setPassword(RAW_PASSWORD);
         request.setNickname("테스터");
 
         User savedUser = User.builder()
                 .id(1L)
                 .username("testuser")
-                .password("1234")
+                .password("ENC")
                 .nickname("테스터")
                 .role(Role.USER)
                 .build();
 
         when(userRepository.existsByUsername("testuser")).thenReturn(false);
+        when(userRepository.existsByNickname("테스터")).thenReturn(false);
+        when(passwordEncoder.encode(RAW_PASSWORD)).thenReturn("ENC");
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
         UserResponse response = userService.signup(request);
@@ -71,7 +76,7 @@ class UserServiceTest {
     void signup_fail_duplicateUsername() {
         SignupRequest request = new SignupRequest();
         request.setUsername("testuser");
-        request.setPassword("1234");
+        request.setPassword(RAW_PASSWORD);
         request.setNickname("테스터");
 
         when(userRepository.existsByUsername("testuser")).thenReturn(true);
@@ -88,18 +93,19 @@ class UserServiceTest {
     void login_success() {
         LoginRequest request = new LoginRequest();
         request.setUsername("testuser");
-        request.setPassword("1234");
+        request.setPassword(RAW_PASSWORD);
 
         User user = User.builder()
                 .id(1L)
                 .username("testuser")
-                .password("1234")
+                .password("ENC")
                 .nickname("테스터")
                 .role(Role.USER)
                 .build();
 
         when(userRepository.findByUsername("testuser"))
                 .thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(eq(RAW_PASSWORD), eq("ENC"))).thenReturn(true);
 
         UserResponse response = userService.login(request);
 
@@ -113,7 +119,7 @@ class UserServiceTest {
     void login_fail_notFoundUsername() {
         LoginRequest request = new LoginRequest();
         request.setUsername("unknown");
-        request.setPassword("1234");
+        request.setPassword(RAW_PASSWORD);
 
         when(userRepository.findByUsername("unknown"))
                 .thenReturn(Optional.empty());
@@ -128,18 +134,19 @@ class UserServiceTest {
     void login_fail_wrongPassword() {
         LoginRequest request = new LoginRequest();
         request.setUsername("testuser");
-        request.setPassword("wrong");
+        request.setPassword("wrongpass1");
 
         User user = User.builder()
                 .id(1L)
                 .username("testuser")
-                .password("1234")
+                .password("ENC")
                 .nickname("테스터")
                 .role(Role.USER)
                 .build();
 
         when(userRepository.findByUsername("testuser"))
                 .thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(eq("wrongpass1"), eq("ENC"))).thenReturn(false);
 
         assertThatThrownBy(() -> userService.login(request))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -152,7 +159,7 @@ class UserServiceTest {
         User user = User.builder()
                 .id(1L)
                 .username("testuser")
-                .password("1234")
+                .password("ENC")
                 .nickname("테스터")
                 .role(Role.USER)
                 .build();
@@ -173,7 +180,7 @@ class UserServiceTest {
         User user1 = User.builder()
                 .id(1L)
                 .username("user1")
-                .password("1234")
+                .password("ENC")
                 .nickname("유저1")
                 .role(Role.USER)
                 .build();
@@ -181,7 +188,7 @@ class UserServiceTest {
         User user2 = User.builder()
                 .id(2L)
                 .username("user2")
-                .password("1234")
+                .password("ENC")
                 .nickname("유저2")
                 .role(Role.USER)
                 .build();
@@ -202,18 +209,19 @@ class UserServiceTest {
         User user = User.builder()
                 .id(1L)
                 .username("old")
-                .password("1111")
+                .password("ENC_OLD")
                 .nickname("기존닉")
                 .role(Role.USER)
                 .build();
 
         SignupRequest request = new SignupRequest();
         request.setUsername("new");
-        request.setPassword("2222");
+        request.setPassword(RAW_PASSWORD);
         request.setNickname("새닉네임");
 
         when(userRepository.findById(1L))
                 .thenReturn(Optional.of(user));
+        when(passwordEncoder.encode(RAW_PASSWORD)).thenReturn("ENC_NEW");
 
         UserResponse response = userService.updateUser(1L, request);
 
@@ -221,7 +229,7 @@ class UserServiceTest {
         assertThat(response.getNickname()).isEqualTo("새닉네임");
 
         assertThat(user.getUsername()).isEqualTo("new");
-        assertThat(user.getPassword()).isEqualTo("2222");
+        assertThat(user.getPassword()).isEqualTo("ENC_NEW");
         assertThat(user.getNickname()).isEqualTo("새닉네임");
     }
 
@@ -231,7 +239,7 @@ class UserServiceTest {
         User user = User.builder()
                 .id(1L)
                 .username("testuser")
-                .password("1234")
+                .password("ENC")
                 .nickname("테스터")
                 .role(Role.USER)
                 .build();
