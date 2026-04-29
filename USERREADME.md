@@ -1,4 +1,4 @@
-# 회원(User) 도메인
+<img width="445" height="256" alt="image" src="https://github.com/user-attachments/assets/ba6b56ae-6c86-4bec-877d-2e3f1f7b4a1c" /># 회원(User) 도메인
 
 회원가입·로그인·조회·수정·삭제를 **레이어드 아키텍처**로 최소 구현한 초기 커밋 기준 문서입니다.  
 구현 코드는 `practice/` 모듈의 `com.test.practice.user` 패키지에 있습니다.
@@ -54,7 +54,7 @@ practice/src/main/java/com/test/practice/user/
 | DELETE | `/api/users/{id}` | 회원 삭제 (응답 204 No Content) |
 
 ## 테스트
-
+<img width="445" height="256" alt="image" src="https://github.com/user-attachments/assets/6c109bfa-6c44-4f1c-8e0e-a3e1b3e9d208" />
 - `practice/src/test/java/com/test/practice/UserServiceTest.java`
 - 회원가입 성공/중복 아이디, 로그인 성공·실패, 단건·전체 조회, 수정, 삭제 시나리오
 
