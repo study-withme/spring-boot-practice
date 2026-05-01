@@ -1,4 +1,4 @@
-package com.test.practice;
+package com.test.practice.user.service;
 
 import com.test.practice.user.dto.LoginRequest;
 import com.test.practice.user.dto.SignupRequest;
@@ -6,7 +6,6 @@ import com.test.practice.user.dto.UserResponse;
 import com.test.practice.user.entity.Role;
 import com.test.practice.user.entity.User;
 import com.test.practice.user.repository.UserRepository;
-import com.test.practice.user.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
