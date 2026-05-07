@@ -7,8 +7,9 @@
 
 - REST API로 게시글 **생성·전체 조회·단건 조회·특정 사용자 게시글 목록·수정·삭제** 제공
 - **Spring Data JPA**로 `Post` 엔티티 영속화, `deleteTime`이 `null`인 행만 “노출 목록”으로 조회하는 **소프트 삭제** 패턴
-- 생성 요청에 **Bean Validation**(`@Valid`, `@NotBlank`, `@Size` 등) 적용
-- 수정 시 **작성자 `userId` 일치 여부** 검증 (`IllegalArgumentException`)
+- 생성·수정 요청에 **Bean Validation**(`@Valid`, `@NotBlank`, `@Size` 등) 적용 (규칙 동일)
+- 수정·삭제 시 **작성자 `userId` 일치 여부** 검증 (`IllegalArgumentException`)
+- 단건 조회 시 **`viewCount` 증가** (`increaseViewCount`)
 - **서비스 단위 테스트(Mockito)** 로 작성·조회·수정·삭제 시나리오 검증 (`PostServiceTest`)
 
 ## 패턴과 구현 방식
@@ -53,8 +54,8 @@ practice/src/main/java/com/test/practice/post/
 | GET | `/api/posts` | 삭제되지 않은 게시글 전체 조회 |
 | GET | `/api/posts/{postId}` | 단건 조회 (삭제된 글은 없음으로 처리) |
 | GET | `/api/posts/user/{userId}` | 특정 사용자의 삭제되지 않은 게시글 목록 |
-| PUT | `/api/posts/{postId}?userId={userId}` | 수정 (`PostUpdateRequest` body, 작성자 `userId` 필요) |
-| DELETE | `/api/posts/{postId}` | 소프트 삭제 (`deleteTime` 설정) |
+| PUT | `/api/posts/{postId}?userId={userId}` | 수정 (`PostUpdateRequest` body, `@Valid`, 작성자 `userId` 필요) |
+| DELETE | `/api/posts/{postId}?userId={userId}` | 소프트 삭제 (`deleteTime` 설정, 작성자 `userId` 필요) |
 
 ## 요청·응답 예시 (JSON)
 
@@ -112,6 +113,8 @@ practice/src/main/java/com/test/practice/post/
 
 ### GET `/api/posts/{postId}` — 단건
 
+**동작**: 응답 직전 **`viewCount`가 1 증가**합니다(같은 트랜잭션에서 조회·반영).
+
 **응답** `200 OK` — 본문은 목록의 한 요소와 동일한 형태의 단일 객체입니다.
 
 ### GET `/api/posts/user/{userId}` — 특정 사용자 글 목록
@@ -146,9 +149,11 @@ practice/src/main/java/com/test/practice/post/
 }
 ```
 
-### DELETE `/api/posts/{postId}` — 소프트 삭제
+### DELETE `/api/posts/{postId}?userId=1` — 소프트 삭제
 
-**응답** `200 OK`, **body 없음** (`void`). DB에서는 `deleteTime`이 설정됩니다.
+**쿼리**: `userId`(작성자) 필수. 작성자가 아니면 `IllegalArgumentException` 처리(현재는 전역 핸들러 없이 기본 응답).
+
+**응답** `200 OK`, **body 없음** (`void`). DB에서는 `deleteTime`이 설정됩니다. 이미 삭제된 글은 단건 조회와 같이 “없음”으로 처리됩니다.
 
 ---
 
@@ -156,7 +161,7 @@ practice/src/main/java/com/test/practice/post/
 
 <img width="352" height="151" alt="image" src="https://github.com/user-attachments/assets/ca507378-2e85-485a-aeec-57a3932a142d" />
 - `practice/src/test/java/com/test/practice/post/service/PostServiceTest.java`
-- 게시글 작성 성공, 단건 조회 성공, 수정 성공, 삭제 성공(삭제 후 `deleteTime` 설정 여부)
+- 게시글 작성 성공, 단건 조회 성공(조회수 증가), 수정 성공, 삭제 성공(작성자 일치), 삭제 실패(작성자 불일치)
 - 로컬 확인: `practice` 모듈에서  
   `.\gradlew test --tests com.test.practice.post.service.PostServiceTest`  
   → 예시 로그:
@@ -168,15 +173,13 @@ BUILD SUCCESSFUL in 2s
 
 ## 현재 구현의 한계 · 보강 여지
 
-- 삭제 API는 **작성자 검증이 없음** — 누구나 `postId`만 알면 소프트 삭제 가능합니다. 수정과 동일하게 `userId` 또는 인증 주체와 맞추는 것이 좋습니다.
-- **조회수(`viewCount`)** 필드와 `increaseViewCount()`는 엔티티에 있으나, 컨트롤러·서비스에서 호출하는 API는 아직 없습니다.
-- `PostUpdateRequest`에는 생성과 같은 수준의 Bean Validation이 없습니다 — 필요하면 제목·본문 규칙을 맞추거나 `@Valid`를 보강할 수 있습니다.
-- 삭제 시 `findById`만 사용하므로, 이미 소프트 삭제된 글에 대한 동작 정책(재삭제 방지 등)은 선택적으로 정리할 수 있습니다.
+- **조회수 동시성**: 다수가 동시에 단건 조회하면 `viewCount` 정확도·경합 이슈가 생길 수 있습니다. 필요 시 낙관적 락(`@Version`) 또는 별도 집계 방식을 검토합니다.
 - 인증·인가(JWT·세션 등)가 없어 `userId`를 클라이언트가 직접 넘기는 형태입니다 — 실서비스에서는 로그인 사용자 기준으로 바꾸는 것이 안전합니다.
+- **전역 예외 응답**(`@ControllerAdvice`)으로 HTTP 상태·에러 본문 형식 통일은 아직 선택 과제입니다.
 
 ## 다음에 다루면 좋은 것들
 
-- 삭제·조회수 증가에 **권한·검증** 통일, **전역 예외 응답**(`@ControllerAdvice`)
+- **전역 예외 응답**(`@ControllerAdvice`)으로 `IllegalArgumentException` 등 매핑 통일
 - `PostServiceTest`에 실패 케이스(없는 글, 작성자 불일치 수정 등) 보강
 - `@WebMvcTest` 컨트롤러 테스트, `@DataJpaTest` 등 통합 테스트
 - API 문서화(SpringDoc 등)

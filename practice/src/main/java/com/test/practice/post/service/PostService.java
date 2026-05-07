@@ -53,13 +53,15 @@ public class PostService {
                 .toList();
     }
 
-    // 게시글 단건 조회 - Read
+    // 게시글 단건 조회 - Read (조회수 증가)
+    @Transactional
     public PostResponse getPost(Long postId) {
         // 1. 삭제되지 않은 게시글 단건 조회
         Post post = postRepository.findByIdAndDeleteTimeIsNull(postId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
 
-        // 2. 엔티티를 응답 DTO로 변환
+        // 2. 조회수 증가 후 응답 DTO로 변환
+        post.increaseViewCount();
         return new PostResponse(post);
     }
 
@@ -94,12 +96,17 @@ public class PostService {
 
     // 게시글 삭제 - Delete
     @Transactional
-    public void deletePost(Long postId) {
-        // 1. 삭제 대상 게시글 조회
-        Post post = postRepository.findById(postId)
+    public void deletePost(Long userId, Long postId) {
+        // 1. 삭제 대상 게시글 조회 (미삭제 글만)
+        Post post = postRepository.findByIdAndDeleteTimeIsNull(postId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
 
-        // 2. 소프트 삭제 처리(deleteTime 설정)
+        // 2. 작성자만 삭제 가능
+        if (!post.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("게시글 작성자만 삭제할 수 있습니다.");
+        }
+
+        // 3. 소프트 삭제 처리(deleteTime 설정)
         post.delete();
     }
 

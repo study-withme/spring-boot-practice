@@ -88,12 +88,20 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
-        // 2. 요청값으로 엔티티 상태 변경
+        // 2. 다른 회원과 아이디·닉네임 중복 여부 검증
+        if (userRepository.existsByUsernameAndIdNot(signupRequest.getUsername(), id)) {
+            throw new IllegalArgumentException("이미 존재하는 아이디입니다.");
+        }
+        if (userRepository.existsByNicknameAndIdNot(signupRequest.getNickname(), id)) {
+            throw new IllegalArgumentException("이미 존재하는 닉네임입니다.");
+        }
+
+        // 3. 요청값으로 엔티티 상태 변경
         user.setUsername(signupRequest.getUsername());
         user.setPassword(passwordEncoder.encode(signupRequest.getPassword()));
         user.setNickname(signupRequest.getNickname());
 
-        // 3. 변경된 엔티티를 응답 DTO로 변환
+        // 4. 변경된 엔티티를 응답 DTO로 변환
         return UserResponse.from(user);
     }
 

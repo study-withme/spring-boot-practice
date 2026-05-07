@@ -19,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -80,7 +81,7 @@ class PostServiceTest {
     }
 
     @Test
-    @DisplayName("게시글 단건 조회 성공")
+    @DisplayName("게시글 단건 조회 성공 — 조회수 1 증가")
     void getPost_success() {
         when(postRepository.findByIdAndDeleteTimeIsNull(1L)).thenReturn(Optional.of(post));
 
@@ -89,6 +90,8 @@ class PostServiceTest {
         assertThat(response.getId()).isEqualTo(1L);
         assertThat(response.getTitle()).isEqualTo("기존 제목");
         assertThat(response.getContent()).isEqualTo("기존 내용");
+        assertThat(response.getViewCount()).isEqualTo(1L);
+        assertThat(post.getViewCount()).isEqualTo(1L);
 
         verify(postRepository).findByIdAndDeleteTimeIsNull(1L);
     }
@@ -111,14 +114,26 @@ class PostServiceTest {
     }
 
     @Test
-    @DisplayName("게시글 삭제 성공")
+    @DisplayName("게시글 삭제 성공 — 작성자만 가능")
     void deletePost_success() {
-        when(postRepository.findById(1L)).thenReturn(Optional.of(post));
+        when(postRepository.findByIdAndDeleteTimeIsNull(1L)).thenReturn(Optional.of(post));
 
-        postService.deletePost(1L);
+        postService.deletePost(1L, 1L);
 
         assertThat(post.getDeleteTime()).isNotNull();
 
-        verify(postRepository).findById(1L);
+        verify(postRepository).findByIdAndDeleteTimeIsNull(1L);
+    }
+
+    @Test
+    @DisplayName("게시글 삭제 실패 — 작성자 불일치")
+    void deletePost_fail_notAuthor() {
+        when(postRepository.findByIdAndDeleteTimeIsNull(1L)).thenReturn(Optional.of(post));
+
+        assertThatThrownBy(() -> postService.deletePost(999L, 1L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("게시글 작성자만 삭제할 수 있습니다.");
+
+        assertThat(post.getDeleteTime()).isNull();
     }
 }

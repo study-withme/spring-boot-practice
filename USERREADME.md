@@ -3,6 +3,10 @@
 회원가입·로그인·조회·수정·삭제를 **레이어드 아키텍처**로 최소 구현한 초기 커밋 기준 문서입니다.  
 구현 코드는 `practice/` 모듈의 `com.test.practice.user` 패키지에 있습니다.
 
+## 도메인 보강 메모
+
+- **2026-05-07** — 회원 수정(`PUT /api/users/{id}`) 시 `UserRepository.existsByUsernameAndIdNot`, `existsByNicknameAndIdNot`으로 **다른 id의 회원**과 아이디·닉네임이 겹치면 가입과 동일한 메시지로 거절합니다. 본인이 원래 쓰던 아이디·닉네임을 유지하는 수정은 허용됩니다.
+
 ## 이 커밋에서 한 일
 
 - REST API로 회원 **가입·로그인·단건/전체 조회·수정·삭제** 제공

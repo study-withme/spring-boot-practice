@@ -220,6 +220,8 @@ class UserServiceTest {
 
         when(userRepository.findById(1L))
                 .thenReturn(Optional.of(user));
+        when(userRepository.existsByUsernameAndIdNot("new", 1L)).thenReturn(false);
+        when(userRepository.existsByNicknameAndIdNot("새닉네임", 1L)).thenReturn(false);
         when(passwordEncoder.encode(RAW_PASSWORD)).thenReturn("ENC_NEW");
 
         UserResponse response = userService.updateUser(1L, request);
@@ -230,6 +232,60 @@ class UserServiceTest {
         assertThat(user.getUsername()).isEqualTo("new");
         assertThat(user.getPassword()).isEqualTo("ENC_NEW");
         assertThat(user.getNickname()).isEqualTo("새닉네임");
+
+        verify(userRepository).existsByUsernameAndIdNot("new", 1L);
+        verify(userRepository).existsByNicknameAndIdNot("새닉네임", 1L);
+    }
+
+    @Test
+    @DisplayName("회원 수정 실패 - 다른 회원과 아이디 중복")
+    void updateUser_fail_duplicateUsername() {
+        User user = User.builder()
+                .id(1L)
+                .username("old")
+                .password("ENC_OLD")
+                .nickname("기존닉")
+                .role(Role.USER)
+                .build();
+
+        SignupRequest request = new SignupRequest();
+        request.setUsername("taken");
+        request.setPassword(RAW_PASSWORD);
+        request.setNickname("새닉네임");
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.existsByUsernameAndIdNot("taken", 1L)).thenReturn(true);
+
+        assertThatThrownBy(() -> userService.updateUser(1L, request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("이미 존재하는 아이디입니다.");
+
+        verify(userRepository, never()).existsByNicknameAndIdNot(any(), any());
+    }
+
+    @Test
+    @DisplayName("회원 수정 실패 - 다른 회원과 닉네임 중복")
+    void updateUser_fail_duplicateNickname() {
+        User user = User.builder()
+                .id(1L)
+                .username("old")
+                .password("ENC_OLD")
+                .nickname("기존닉")
+                .role(Role.USER)
+                .build();
+
+        SignupRequest request = new SignupRequest();
+        request.setUsername("new");
+        request.setPassword(RAW_PASSWORD);
+        request.setNickname("남이쓰는닉");
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.existsByUsernameAndIdNot("new", 1L)).thenReturn(false);
+        when(userRepository.existsByNicknameAndIdNot("남이쓰는닉", 1L)).thenReturn(true);
+
+        assertThatThrownBy(() -> userService.updateUser(1L, request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("이미 존재하는 닉네임입니다.");
     }
 
     @Test
